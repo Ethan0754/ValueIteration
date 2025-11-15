@@ -124,7 +124,7 @@ class Agent:
       if mdp.is_terminal[state]:
         continue
 
-      max_q_value = -999
+      max_q_value = -999999999999999
       max_q_action = '0'
 
       for action in mdp.actions:
@@ -140,15 +140,13 @@ class Agent:
 
   def Q(self, state, action, gamma, mdp, U):
     """
-    # Fill this function in for the next assignment.
+    Calculate Q(s,a) - the inside of the bellman equation
     """
     q = 0
 
     for next_state, prob in mdp.transition_model[(state, action)].items():
-
-      # -------------------------------------- #
-      # Your code here                         #
-      # -------------------------------------- #
+      reward = mdp.reward(state, action, next_state)
+      q += prob*(reward+gamma*U[next_state])
 
     return q
 
@@ -183,10 +181,12 @@ class Agent:
         if mdp.is_terminal[state]:
           continue
 
-        # -------------------------------------- #
-        # Your code here                         #
-        # -------------------------------------- #
-
+        max_q = -999999999999999
+        for action in mdp.actions:
+          calc_q = self.Q(state, action, gamma, mdp, U_old)
+          if calc_q > max_q:
+            max_q = calc_q
+        U_current[state] = max_q
 
         # Calculate |U_current - U_old| and update delta if needed.
         utility_change = abs(U_current[state] - U_old[state])
